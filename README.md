@@ -1,27 +1,150 @@
-# project
-Проєкт до магістерської дисертації
+# Master’s Thesis Project: ELK + Filebeat (Ubuntu 25.10)
 
-Для коректної роботи проєкту необіхдно правильно розташувати папки `filebeat` та `elk`, оскільки при неправильному встановленні у вас може статися помилка.
-Також вимушений попередити, що проєкт реалізований на ОС `Ubuntu 25.10`, тому врахуйте це при встановленні, 
-оскільки на новіших або старіших версіях частина модулів для роботи `Docker, Elasticsearch, Kibana та Filebeat` може потребуватися встановлення або видалення деяких модулів
+Проєкт до магістерської дисертації. Репозиторій містить конфігурацію для розгортання **ELK (Elasticsearch + Kibana)** через **Docker Compose** та налаштування **Filebeat** для збору/відправки логів.
 
-Для папки `elk` із файлом `docker-compose.yml` розташування не є критичним, але для чистоти експерименту та кращої взаємодії рекомендується розташувати папку `elk` у `/home/user`
+## Зміст
 
-Папку ж `filebeat` встановлюємо виключно в системну папку `/etc`, оскільки саме `filebeat.yml` здійснює аналіз самих логів.
-Після встановлення уважно перевірте статус файлу filebeat.yml 
-!!! Він має бути під доступом root.
-У випадку якщо ж файл `filebeat.yml` не є під root, то рекомендується створити цей файл самостійно, вставивши код із new.txt.
+* [Вимоги](#вимоги)
+* [Рекомендоване розміщення папок](#рекомендоване-розміщення-папок)
+* [Встановлення та запуск](#встановлення-та-запуск)
+* [Налаштування Filebeat](#налаштування-filebeat)
+* [Перевірка роботи](#перевірка-роботи)
+* [Типові проблеми](#типові-проблеми)
+* [Ліцензія](#ліцензія)
 
+## Вимоги
 
-Project for the Master’s Thesis
+* **OS:** Ubuntu **25.10** (проєкт тестувався саме на цій версії; на інших версіях можуть бути відмінності в залежностях/пакетах).
+* **Docker Engine** та **Docker Compose** (плагін `docker compose` або `docker-compose`).
+* Доступ **sudo/root** (потрібен для розміщення й керування конфігом Filebeat у `/etc`).
 
-For the project to work correctly, it is necessary to place the `filebeat` and `elk` folders properly, because an incorrect setup may result in an error.
-I also need to warn you that the project was implemented on `Ubuntu 25.10`, so please keep this in mind during installation,
-since on newer or older versions some modules required for `Docker, Elasticsearch, Kibana, and Filebeat` may need to be installed or removed.
+## Рекомендоване розміщення папок
 
-For the `elk` folder containing the `docker-compose.yml` file, the location is not critical; however, for the sake of a clean experiment and better interaction, it is recommended to place the `elk` folder in `/home/user`.
+> Важливо: коректне розташування папок **elk** та **filebeat** критичне для повторюваності експерименту.
 
-The `filebeat` folder must be installed only in the system directory `/etc`, because `filebeat.yml` performs the analysis of the logs themselves.
-After installation, carefully check the status/permissions of the `filebeat.yml` file.
-!!! It must be accessible as root.
-If `filebeat.yml` is not owned by root, it is recommended to create this file yourself by inserting the code at new.txt file.
+### ELK
+
+* Папка `elk` може бути розміщена будь-де, але **рекомендовано**:
+
+  * `/home/user/elk`
+
+### Filebeat
+
+* Папку/конфіг Filebeat потрібно розмістити **в системній директорії**:
+
+  * `/etc/filebeat/`
+* Причина: `filebeat.yml` працює з системними логами і зазвичай потребує відповідних прав доступу.
+
+## Встановлення та запуск
+
+### 1) Запуск ELK (Docker Compose)
+
+Перейдіть у директорію з `docker-compose.yml`:
+
+```bash
+cd /home/user/elk
+```
+
+Запустіть стек:
+
+```bash
+sudo docker compose up -d
+```
+
+Перевірте, що контейнери піднялись:
+
+```bash
+sudo docker ps
+```
+
+### 2) Підготовка Filebeat
+
+Переконайтесь, що конфіг лежить тут:
+
+```
+/etc/filebeat/filebeat.yml
+```
+
+Якщо вам потрібно створити `filebeat.yml` вручну (наприклад, файл має неправильні права або відсутній) — використайте вміст з `new.txt`:
+
+```bash
+sudo mkdir -p /etc/filebeat
+sudo nano /etc/filebeat/filebeat.yml
+# вставте вміст з filebeat/new.txt або new.txt (залежно від вашої структури)
+```
+
+## Налаштування Filebeat
+
+### Права доступу (ВАЖЛИВО)
+
+Файл **/etc/filebeat/filebeat.yml** має бути під **root**:
+
+Перевірка:
+
+```bash
+ls -l /etc/filebeat/filebeat.yml
+```
+
+Виправлення власника/прав (якщо потрібно):
+
+```bash
+sudo chown root:root /etc/filebeat/filebeat.yml
+sudo chmod 600 /etc/filebeat/filebeat.yml
+```
+
+> Примітка: конкретні права можуть залежати від вашого сценарію, але **власник root** — обов’язково.
+
+### Запуск/перезапуск Filebeat
+
+Якщо Filebeat встановлено як сервіс:
+
+```bash
+sudo systemctl restart filebeat
+sudo systemctl status filebeat --no-pager
+```
+
+Якщо запускаєте вручну (рідше):
+
+```bash
+sudo filebeat -e -c /etc/filebeat/filebeat.yml
+```
+
+## Перевірка роботи
+
+* Перевірте логи Filebeat:
+
+```bash
+sudo journalctl -u filebeat -n 100 --no-pager
+```
+
+* Перевірте доступність Kibana (типово):
+
+  * `http://localhost:5601`
+
+* Переконайтесь, що індекси/дані з’являються в Elasticsearch/Kibana (Discover / Index Management).
+
+## Типові проблеми
+
+### 1) “permission denied” або Filebeat не читає логи
+
+* Переконайтесь, що `filebeat.yml` під root і має коректні права.
+* Перевірте, які саме файли логів ви читаєте в конфігу і чи є до них доступ.
+
+### 2) ELK не стартує або падають контейнери
+
+* Перевірте:
+
+```bash
+sudo docker compose logs -f
+```
+
+* Часто причина — порти зайняті або недостатньо ресурсів.
+
+### 3) Немає подій у Kibana
+
+* Перевірте, чи Filebeat відправляє дані на правильний host/port Elasticsearch (у `filebeat.yml`).
+* Перевірте логи Filebeat та Elasticsearch.
+
+## Ліцензія
+
+Навчальний/академічний проєкт для магістерської роботи. (За потреби тут можна додати MIT/Apache-2.0 або ваш текст ліцензії.)
