@@ -9,7 +9,7 @@
 
 Папку ж `filebeat` встановлюємо виключно в системну папку `/etc`, оскільки саме `filebeat.yml` здійснює аналіз самих логів.
 Після встановлення уважно перевірте статус файлу filebeat.yml !!! Він має бути під доступом root
-У випадку якщо ж файл `filebeat.yml` не є під root, то рекомендується створити цей файл самостійно, вставивши код наприкінці файлу `README` або у файлі txt.
+У випадку якщо ж файл `filebeat.yml` не є під root, то рекомендується створити цей файл самостійно, вставивши код із new.txt.
 
 
 Project for the Master’s Thesis
@@ -22,7 +22,7 @@ For the `elk` folder containing the `docker-compose.yml` file, the location is n
 
 The `filebeat` folder must be installed only in the system directory `/etc`, because `filebeat.yml` performs the analysis of the logs themselves.
 After installation, carefully check the status/permissions of the `filebeat.yml` file!!! It must be accessible as root
-If `filebeat.yml` is not owned by root, it is recommended to create this file yourself by inserting the code at the end of the `README` file or txt file.
+If `filebeat.yml` is not owned by root, it is recommended to create this file yourself by inserting the code at new.txt file.
 
 
 ###################### MODULES CONFIGURATION (REQUIRED) ########################
