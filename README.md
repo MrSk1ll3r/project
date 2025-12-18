@@ -8,7 +8,8 @@
 Для папки `elk` із файлом `docker-compose.yml` розташування не є критичним, але для чистоти експерименту та кращої взаємодії рекомендується розташувати папку `elk` у `/home/user`
 
 Папку ж `filebeat` встановлюємо виключно в системну папку `/etc`, оскільки саме `filebeat.yml` здійснює аналіз самих логів.
-Після встановлення уважно перевірте статус файлу filebeat.yml !!! Він має бути під доступом root
+Після встановлення уважно перевірте статус файлу filebeat.yml 
+!!! Він має бути під доступом root.
 У випадку якщо ж файл `filebeat.yml` не є під root, то рекомендується створити цей файл самостійно, вставивши код із new.txt.
 
 
@@ -21,5 +22,6 @@ since on newer or older versions some modules required for `Docker, Elasticsearc
 For the `elk` folder containing the `docker-compose.yml` file, the location is not critical; however, for the sake of a clean experiment and better interaction, it is recommended to place the `elk` folder in `/home/user`.
 
 The `filebeat` folder must be installed only in the system directory `/etc`, because `filebeat.yml` performs the analysis of the logs themselves.
-After installation, carefully check the status/permissions of the `filebeat.yml` file!!! It must be accessible as root
+After installation, carefully check the status/permissions of the `filebeat.yml` file.
+!!! It must be accessible as root.
 If `filebeat.yml` is not owned by root, it is recommended to create this file yourself by inserting the code at new.txt file.
